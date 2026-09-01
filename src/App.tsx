@@ -7,22 +7,33 @@ import { MobileGrowthLab } from './components/simulator/MobileGrowthLab';
 import { MobileGoalsView } from './components/teen/MobileGoalsView';
 import { MobileParentStudio } from './components/parent/MobileParentStudio';
 import { PinGateModal } from './components/modals/PinGateModal';
+import { CurrencyPickerModal } from './components/modals/CurrencyPickerModal';
+import { ProfilePickerModal } from './components/modals/ProfilePickerModal';
+import { AddGoalModal } from './components/modals/AddGoalModal';
 import { useMobileProfiles } from './hooks/useMobileProfiles';
 import { calculateCompoundSchedule } from './services/compoundEngine';
 import { CURRENCIES } from './config/currencies';
 import type { MobileTab } from './types/userRole';
-import type { SimulationParams } from './types/allowance';
+import type { SimulationParams, CurrencyCode } from './types/allowance';
 import type { UserProfile } from './types/profile';
+import type { SavingsGoal } from './types/goal';
 
 export function App() {
   const {
+    profiles,
     activeProfile,
+    activeProfileId,
+    switchProfile,
     updateActiveProfileData,
+    createNewProfile,
     isLoading,
   } = useMobileProfiles();
 
   const [activeTab, setActiveTab] = useState<MobileTab>('VAULT');
   const [isPinGateOpen, setIsPinGateOpen] = useState<boolean>(false);
+  const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState<boolean>(false);
+  const [isProfilePickerOpen, setIsProfilePickerOpen] = useState<boolean>(false);
+  const [isAddGoalOpen, setIsAddGoalOpen] = useState<boolean>(false);
   const [isParentUnlocked, setIsParentUnlocked] = useState<boolean>(false);
   const [simParams, setSimParams] = useState<SimulationParams>(() => activeProfile.simulationParams);
 
@@ -49,6 +60,15 @@ export function App() {
   const handleLockParent = () => {
     setIsParentUnlocked(false);
     setActiveTab('VAULT');
+  };
+
+  const handleSelectCurrency = (code: CurrencyCode) => {
+    updateActiveProfileData({ currencyCode: code });
+  };
+
+  const handleAddGoal = (newGoal: SavingsGoal) => {
+    const updatedGoals = [...activeProfile.goals, newGoal];
+    updateActiveProfileData({ goals: updatedGoals });
   };
 
   const handleActivatePlan = () => {
@@ -100,7 +120,8 @@ export function App() {
       <MobileHeader
         profile={activeProfile}
         currency={activeCurrency}
-        onOpenProfilePicker={() => {}}
+        onOpenProfilePicker={() => setIsProfilePickerOpen(true)}
+        onOpenCurrencyPicker={() => setIsCurrencyPickerOpen(true)}
       />
 
       {/* Main Screen Content */}
@@ -129,7 +150,7 @@ export function App() {
             goals={activeProfile.goals}
             vaultBalance={activeProfile.activePlan?.currentBalance || 0}
             currency={activeCurrency}
-            onOpenAddGoal={() => {}}
+            onOpenAddGoal={() => setIsAddGoalOpen(true)}
           />
         )}
 
@@ -154,6 +175,32 @@ export function App() {
         isOpen={isPinGateOpen}
         onSuccess={handlePinSuccess}
         onClose={() => setIsPinGateOpen(false)}
+      />
+
+      {/* Multi-Currency Modal */}
+      <CurrencyPickerModal
+        isOpen={isCurrencyPickerOpen}
+        currentCode={activeProfile.currencyCode}
+        onSelectCurrency={handleSelectCurrency}
+        onClose={() => setIsCurrencyPickerOpen(false)}
+      />
+
+      {/* Profile Sibling Switcher Modal */}
+      <ProfilePickerModal
+        isOpen={isProfilePickerOpen}
+        profiles={profiles}
+        activeProfileId={activeProfileId}
+        onSelectProfile={switchProfile}
+        onCreateProfile={createNewProfile}
+        onClose={() => setIsProfilePickerOpen(false)}
+      />
+
+      {/* Add Goal Modal */}
+      <AddGoalModal
+        isOpen={isAddGoalOpen}
+        currency={activeCurrency}
+        onAddGoal={handleAddGoal}
+        onClose={() => setIsAddGoalOpen(false)}
       />
     </div>
   );
