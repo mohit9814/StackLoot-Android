@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StackLoot</string>
+    <string name="title_activity_main">StackLoot</string>
+    <string name="package_name">com.stackloot.app</string>
+    <string name="custom_url_scheme">com.stackloot.app</string>
+</resources>
