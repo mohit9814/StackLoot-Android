@@ -441,7 +441,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col antialiased selection:bg-amber-400 selection:text-zinc-950">
       {/* Mobile Top Header */}
       <MobileHeader
         profile={activeProfile}

@@ -96,12 +96,12 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl">
+          <div className="p-2 bg-zinc-900 border border-white/10 text-amber-400 rounded-xl">
             <Award className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-base font-black text-white">Chores & Responsibilities</h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-zinc-400">
               {completedCount} of {tasks.length} bounties earned
             </p>
           </div>
@@ -110,18 +110,18 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setShowActivityDrawer(!showActivityDrawer)}
-            className="p-2 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs active:scale-95 transition-all cursor-pointer"
+            className="p-2 bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white rounded-xl text-xs active:scale-95 transition-all cursor-pointer"
             title="Activity Notifications"
           >
-            <History className="w-4 h-4 text-indigo-400" />
+            <History className="w-4 h-4 text-zinc-400" />
           </button>
 
           {userRole === 'PARENT' && (
             <button
               onClick={() => setIsAdding(true)}
-              className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-indigo-500 text-slate-950 rounded-xl flex items-center gap-1 text-xs font-black active:scale-95 transition-all shadow-sm cursor-pointer"
+              className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 rounded-xl flex items-center gap-1 text-xs font-black active:scale-95 transition-all shadow-sm cursor-pointer"
             >
-              <Plus className="w-4 h-4 text-slate-950" />
+              <Plus className="w-4 h-4 text-zinc-950" />
               <span>New Task</span>
             </button>
           )}
@@ -130,30 +130,30 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
 
       {/* Activity Log Drawer */}
       {showActivityDrawer && (
-        <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl p-3 space-y-2 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-            <span className="text-xs font-bold text-indigo-300 flex items-center gap-1">
-              <History className="w-3.5 h-3.5" />
+        <div className="bg-zinc-900 border border-white/10 rounded-2xl p-3 space-y-2 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+            <span className="text-xs font-bold text-zinc-300 flex items-center gap-1">
+              <History className="w-3.5 h-3.5 text-zinc-400" />
               <span>Recent Family Activity</span>
             </span>
-            <button onClick={() => setShowActivityDrawer(false)} className="text-slate-400 hover:text-white p-1">
+            <button onClick={() => setShowActivityDrawer(false)} className="text-zinc-400 hover:text-white p-1">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
           {activities.length > 0 ? (
             <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs">
               {activities.slice(0, 5).map((act) => (
-                <div key={act.id} className="p-2 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <div key={act.id} className="p-2 rounded-xl bg-zinc-950 border border-white/5">
                   <div className="flex justify-between font-bold text-white">
                     <span>{act.title}</span>
                     {act.amount && <span className="text-emerald-400 font-mono">+{formatCurrency(act.amount, currency)}</span>}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{act.description}</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">{act.description}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-[11px] text-slate-400 py-1 text-center">No recent activities logged yet.</p>
+            <p className="text-[11px] text-zinc-400 py-1 text-center">No recent activities logged yet.</p>
           )}
         </div>
       )}
@@ -170,10 +170,10 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
               key={task.id}
               className={`p-3.5 rounded-2xl border transition-all ${
                 isDone
-                  ? 'bg-emerald-950/20 border-emerald-500/30 opacity-80'
+                  ? 'bg-zinc-900/60 border-emerald-500/20 opacity-75'
                   : isPending
-                  ? 'bg-amber-950/25 border-amber-500/40 shadow-sm'
-                  : 'bg-slate-900/95 border-slate-800 shadow-sm'
+                  ? 'bg-zinc-900 border-amber-500/30'
+                  : 'bg-zinc-900/90 border-white/10 shadow-sm'
               }`}
             >
               {isEditing ? (
@@ -183,24 +183,24 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-bold focus:outline-none focus:border-amber-400"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-bold focus:outline-none focus:border-amber-400"
                   />
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
                       value={editReward}
                       onChange={(e) => setEditReward(e.target.value)}
-                      className="w-28 bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-emerald-400 font-mono font-bold"
+                      className="w-28 bg-zinc-950 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-emerald-400 font-mono font-bold"
                     />
                     <button
                       onClick={() => handleSaveEdit(task.id)}
-                      className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold"
+                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold cursor-pointer"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditingTaskId(null)}
-                      className="px-2 py-1 text-slate-400 text-xs"
+                      className="px-2 py-1 text-zinc-400 hover:text-white text-xs cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -212,10 +212,10 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                   <div className="flex items-start gap-2">
                     <span className="text-xl mt-0.5">{task.icon || '⭐'}</span>
                     <div>
-                      <h4 className={`text-xs font-bold leading-snug ${isDone ? 'line-through text-slate-400' : 'text-white'}`}>
+                      <h4 className={`text-xs font-bold leading-snug ${isDone ? 'line-through text-zinc-500' : 'text-white'}`}>
                         {task.title}
                       </h4>
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded mt-1 inline-block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded mt-1 inline-block border border-white/5">
                         {task.frequency}
                       </span>
                     </div>
@@ -230,7 +230,7 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                     {userRole === 'PARENT' && (
                       <button
                         onClick={() => handleStartEdit(task)}
-                        className="p-1 text-slate-400 hover:text-white"
+                        className="p-1 text-zinc-400 hover:text-white"
                         title="Edit Task"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
               )}
 
               {/* Action Buttons depending on role */}
-              <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between">
                 {isDone ? (
                   <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
@@ -251,7 +251,7 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                   userRole === 'PARENT' ? (
                     <button
                       onClick={() => handleParentApprove(task.id)}
-                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer"
+                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>Approve & Credit +{formatCurrency(task.rewardAmount, currency)}</span>
@@ -259,28 +259,28 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                   ) : (
                     <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1 w-full justify-center py-1">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Submitted! Waiting for {parentName}'s Approval ⏳</span>
+                      <span>Submitted! Waiting for {parentName}'s Review ⏳</span>
                     </span>
                   )
                 ) : userRole === 'TEEN' ? (
                   <button
                     onClick={() => handleKidSubmit(task.id)}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black border border-slate-700 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer"
+                    className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-amber-300 rounded-xl text-xs font-black border border-white/10 flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
                     <span>I Completed This Task (Request Approval)</span>
                   </button>
                 ) : (
-                  <div className="flex items-center justify-between w-full text-[11px] text-slate-400">
+                  <div className="flex items-center justify-between w-full text-[11px] text-zinc-400">
                     <span className="flex items-center gap-1">
-                      <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
+                      <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
                       <span>Assigned to {teenName}</span>
                     </span>
                     <button
                       onClick={() => handleParentApprove(task.id)}
                       className="text-emerald-400 font-bold hover:underline"
                     >
-                      Quick Direct Credit
+                      Quick Credit
                     </button>
                   </div>
                 )}
@@ -292,16 +292,16 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
 
       {/* Add Custom Task Modal */}
       {isAdding && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 max-w-sm w-full shadow-2xl space-y-3 animate-in slide-in-from-bottom-6 duration-200">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div className="fixed inset-0 z-50 bg-zinc-950/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-white/10 rounded-3xl p-4 max-w-sm w-full shadow-2xl space-y-3 animate-in slide-in-from-bottom-6 duration-200">
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <div>
                 <h3 className="text-xs font-bold text-white">Add Chore for {teenName}</h3>
-                <p className="text-[10px] text-slate-400">Set task name & cash bounty</p>
+                <p className="text-[10px] text-zinc-400">Set task name & cash bounty</p>
               </div>
               <button
                 onClick={() => setIsAdding(false)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer"
+                className="p-1 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -309,38 +309,38 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
 
             <form onSubmit={handleCreateSubmit} className="space-y-2.5">
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-300">Task Name</label>
+                <label className="text-[11px] font-semibold text-zinc-300">Task Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Clean bedroom or practice piano"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  className="w-full bg-zinc-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-400"
                   required
                   autoFocus
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-300">Bounty Reward ({currency.symbol})</label>
+                <label className="text-[11px] font-semibold text-zinc-300">Bounty Reward ({currency.symbol})</label>
                 <input
                   type="number"
                   min={10}
                   step={10}
                   value={newReward}
                   onChange={(e) => setNewReward(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono"
+                  className="w-full bg-zinc-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white font-mono"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300">Category</label>
+                  <label className="text-[11px] font-semibold text-zinc-300">Category</label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value as TaskCategory)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white font-bold"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-xl px-2 py-1.5 text-xs text-white font-bold"
                   >
                     <option value="CHORES">Chores</option>
                     <option value="STUDY">Study & Books</option>
@@ -350,11 +350,11 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-300">Frequency</label>
+                  <label className="text-[11px] font-semibold text-zinc-300">Frequency</label>
                   <select
                     value={newFrequency}
                     onChange={(e) => setNewFrequency(e.target.value as TaskFrequency)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white font-bold"
+                    className="w-full bg-zinc-950 border border-white/10 rounded-xl px-2 py-1.5 text-xs text-white font-bold"
                   >
                     <option value="DAILY">Daily</option>
                     <option value="WEEKLY">Weekly</option>
@@ -365,7 +365,7 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-gradient-to-r from-amber-400 to-indigo-500 text-slate-950 font-black text-xs rounded-xl active:scale-98 transition-transform flex items-center justify-center gap-1 shadow-md shadow-indigo-500/20 cursor-pointer mt-1"
+                className="w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs rounded-xl active:scale-98 transition-transform flex items-center justify-center gap-1 shadow-md shadow-amber-400/15 cursor-pointer mt-1"
               >
                 <Plus className="w-4 h-4" />
                 <span>Save Chore Bounty</span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ChevronRight, RotateCcw } from 'lucide-react';
+import { ShieldCheck, User, X, Check, RefreshCw } from 'lucide-react';
 import type { AppUserRole } from '../../types/pairing';
 import { hapticsService } from '../../services/hapticsService';
 
@@ -7,7 +7,7 @@ interface RoleSelectionModalProps {
   isOpen: boolean;
   currentRole: AppUserRole;
   onSelectRole: (role: AppUserRole) => void;
-  onResetOnboarding?: () => void;
+  onResetOnboarding: () => void;
   onClose: () => void;
 }
 
@@ -28,79 +28,79 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
 
   const handleReset = async () => {
     await hapticsService.impactHeavy();
+    onResetOnboarding();
     onClose();
-    if (onResetOnboarding) onResetOnboarding();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-end sm:items-center justify-center p-4 select-none">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="fixed inset-0 z-50 bg-zinc-950/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-4 select-none">
+      <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200">
+        <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
           <div>
-            <h3 className="text-base font-black text-white">Select App Mode</h3>
-            <p className="text-xs text-slate-400">Choose your device role</p>
+            <h3 className="text-sm font-black text-white">Switch App Persona</h3>
+            <p className="text-[11px] text-zinc-400">Control view & permission mode</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
+            className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-2.5">
-          {/* Teen Mode Card */}
+        <div className="space-y-2">
+          {/* Teen Mode */}
           <button
             onClick={() => handleChoose('TEEN')}
-            className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all active:scale-98 cursor-pointer ${
+            className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
               currentRole === 'TEEN'
-                ? 'bg-gradient-to-r from-amber-500/20 to-indigo-500/20 border-amber-400 shadow-md'
-                : 'bg-slate-800/80 border-slate-700/60 hover:bg-slate-800'
+                ? 'bg-amber-400/10 border-amber-400 shadow-sm'
+                : 'bg-zinc-900 border-white/5 hover:bg-zinc-800'
             }`}
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-xl shadow-md">
-                🚀
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-zinc-800 text-amber-400 rounded-xl">
+                <User className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs font-black text-white block">Teen Junior Mode</span>
-                <span className="text-[11px] text-slate-400">Track balance, earn yield, unlock loot</span>
+                <span className="text-xs font-black text-white block">Teen / Kid View</span>
+                <span className="text-[10px] text-zinc-400">Vault, Wishlist & Chores</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            {currentRole === 'TEEN' && <Check className="w-4 h-4 text-amber-400" />}
           </button>
 
-          {/* Parent Mode Card */}
+          {/* Parent Mode */}
           <button
             onClick={() => handleChoose('PARENT')}
-            className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all active:scale-98 cursor-pointer ${
+            className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
               currentRole === 'PARENT'
-                ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border-indigo-400 shadow-md'
-                : 'bg-slate-800/80 border-slate-700/60 hover:bg-slate-800'
+                ? 'bg-amber-400/10 border-amber-400 shadow-sm'
+                : 'bg-zinc-900 border-white/5 hover:bg-zinc-800'
             }`}
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-700 flex items-center justify-center text-xl shadow-md">
-                👨‍👧
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-zinc-800 text-amber-400 rounded-xl">
+                <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs font-black text-white block">Parent Studio Mode</span>
-                <span className="text-[11px] text-slate-400">Set allowance rules, match yield, credit</span>
+                <span className="text-xs font-black text-white block">Parent Studio OS</span>
+                <span className="text-[10px] text-zinc-400">Rules & Month Progression (PIN Protected)</span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            {currentRole === 'PARENT' && <Check className="w-4 h-4 text-amber-400" />}
           </button>
+        </div>
 
-          {/* Reset Onboarding Flow Button */}
-          {onResetOnboarding && (
-            <button
-              onClick={handleReset}
-              className="w-full py-2.5 px-3 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-950/60 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer mt-2"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-              <span>Restart Welcome Setup Wizard</span>
-            </button>
-          )}
+        {/* Reset Setup Wizard Link */}
+        <div className="pt-2 border-t border-white/5">
+          <button
+            onClick={handleReset}
+            className="w-full py-2.5 text-zinc-400 hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-zinc-400" />
+            <span>Restart Setup Journey</span>
+          </button>
         </div>
       </div>
     </div>

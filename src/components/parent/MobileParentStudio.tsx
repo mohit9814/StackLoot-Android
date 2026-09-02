@@ -114,7 +114,6 @@ export const MobileParentStudio: React.FC<MobileParentStudioProps> = ({
       );
     }
 
-    // Schedule notification alert
     await notificationService.scheduleMonthlyDividendAlert(
       profile.teenName,
       formatCurrencyExact(monthlyInterest + monthlyMatch, currency)
@@ -126,71 +125,71 @@ export const MobileParentStudio: React.FC<MobileParentStudioProps> = ({
       {/* Studio Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl">
+          <div className="p-2 bg-zinc-900 border border-white/10 text-amber-400 rounded-xl">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-base font-black text-white">Parent Studio OS</h2>
-            <p className="text-[11px] text-slate-400">Rules & payout for {profile.teenName}</p>
+            <p className="text-[11px] text-zinc-400">Rules & payout for {profile.teenName}</p>
           </div>
         </div>
 
         <button
           onClick={onLockSession}
-          className="px-2.5 py-1 bg-rose-950/40 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold active:scale-95 cursor-pointer"
+          className="px-2.5 py-1 bg-zinc-900 border border-white/10 text-zinc-300 rounded-xl text-xs font-bold active:scale-95 cursor-pointer hover:bg-zinc-800"
         >
           Lock
         </button>
       </div>
 
       {/* Pair Child Phone Banner */}
-      <div className="bg-slate-900/95 border border-indigo-500/30 rounded-2xl p-3 flex items-center justify-between shadow-sm">
+      <div className="bg-zinc-900/90 border border-white/10 rounded-2xl p-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-indigo-500/20 text-indigo-300 rounded-lg">
+          <div className="p-1.5 bg-zinc-800 text-amber-400 rounded-lg">
             <QrCode className="w-4 h-4" />
           </div>
           <div>
             <h4 className="text-xs font-black text-white">Pair {profile.teenName}'s Phone</h4>
-            <p className="text-[10px] text-slate-400">Show QR code or 6-digit invite code</p>
+            <p className="text-[10px] text-zinc-400">Show QR code or 6-digit invite code</p>
           </div>
         </div>
         <button
           onClick={onOpenPairing}
-          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-sm"
+          className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-white/10 text-zinc-200 rounded-xl text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-sm"
         >
           Show QR
         </button>
       </div>
 
-      {/* Instant Month Progress Action (No Calendar Lock) */}
-      <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 border border-indigo-500/40 rounded-3xl p-4 shadow-xl space-y-2.5">
+      {/* Instant Month Progress Action */}
+      <div className="bg-zinc-900/95 border border-white/10 rounded-3xl p-4 shadow-xl space-y-2.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-indigo-300 uppercase tracking-wider flex items-center gap-1">
+          <span className="text-xs font-black text-zinc-300 uppercase tracking-wider flex items-center gap-1">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>Cycle Control (Month {currentMonthCycle})</span>
           </span>
-          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-lg border border-emerald-400/20">
             {annualRate}% Yield Active
           </span>
         </div>
 
-        <p className="text-xs text-slate-300 leading-snug">
-          Progress 1 month: Credits <strong>{formatCurrency(allowanceAmount, currency)}</strong> + <strong>{annualRate}% compounding yield</strong> + <strong>{matchMultiplier * 100}% {profile.parentName} match</strong>.
+        <p className="text-xs text-zinc-300 leading-snug">
+          Progress 1 month: Credits <strong>{formatCurrency(allowanceAmount, currency)}</strong> + <strong>{annualRate}% yield</strong> + <strong>{matchMultiplier * 100}% {profile.parentName} match</strong>.
         </p>
 
         <button
           onClick={handleMonthlyDeposit}
-          className="w-full py-3 bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-600 text-slate-950 font-black text-xs rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/25 cursor-pointer"
+          className="w-full py-3 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-lg shadow-amber-400/15 cursor-pointer"
         >
-          <Plus className="w-4 h-4 text-slate-950" />
+          <Plus className="w-4 h-4 text-zinc-950" />
           <span>Progress Month {currentMonthCycle} (Credit Vault)</span>
         </button>
       </div>
 
       {/* Audit Transaction History */}
-      <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-3.5 shadow-sm space-y-2">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-          <History className="w-4 h-4 text-slate-400" />
+      <div className="bg-zinc-900/80 border border-white/10 rounded-3xl p-3.5 shadow-sm space-y-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">
+          <History className="w-4 h-4 text-zinc-400" />
           <span>Vault Transaction Ledger</span>
         </div>
 
@@ -199,11 +198,11 @@ export const MobileParentStudio: React.FC<MobileParentStudioProps> = ({
             {plan.transactions.slice(-6).reverse().map((tx) => (
               <div
                 key={tx.id}
-                className="flex justify-between items-center p-2 rounded-xl bg-slate-800/60 border border-slate-700/50 text-xs"
+                className="flex justify-between items-center p-2 rounded-xl bg-zinc-950 border border-white/5 text-xs"
               >
                 <div>
                   <span className="font-bold text-white block text-[11px]">{tx.notes || tx.type}</span>
-                  <span className="text-[9px] text-slate-400">{new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span className="text-[9px] text-zinc-400">{new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 <span className="font-mono font-black text-emerald-400 text-xs">
                   +{formatCurrencyExact(tx.amount, currency)}
@@ -212,7 +211,7 @@ export const MobileParentStudio: React.FC<MobileParentStudioProps> = ({
             ))}
           </div>
         ) : (
-          <p className="text-[11px] text-slate-400 py-2 text-center">No transactions recorded yet. Start by progressing Month 1 above!</p>
+          <p className="text-[11px] text-zinc-400 py-2 text-center">No transactions recorded yet. Start by progressing Month 1 above!</p>
         )}
       </div>
     </div>

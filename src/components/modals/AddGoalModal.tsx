@@ -12,12 +12,10 @@ interface AddGoalModalProps {
 }
 
 const CATEGORIES: { id: GoalCategory; label: string; icon: string }[] = [
-  { id: 'TECH', label: 'Tech & Gadgets', icon: '💻' },
+  { id: 'TECH', label: 'Gadget / Device', icon: '💻' },
   { id: 'GAMING', label: 'Gaming / Console', icon: '🎮' },
-  { id: 'MUSIC', label: 'Music & Instruments', icon: '🎸' },
-  { id: 'EXPERIENCE', label: 'Trips & Events', icon: '🎟️' },
-  { id: 'EDUCATION', label: 'Learning & Books', icon: '📚' },
-  { id: 'OTHER', label: 'Other Aspiration', icon: '⭐' },
+  { id: 'EXPERIENCE', label: 'Trip / Event', icon: '🎟️' },
+  { id: 'OTHER', label: 'Special Dream', icon: '⭐' },
 ];
 
 export const AddGoalModal: React.FC<AddGoalModalProps> = ({
@@ -27,111 +25,105 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({
   onClose,
 }) => {
   const [title, setTitle] = useState('');
-  const [targetAmount, setTargetAmount] = useState('10000');
+  const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<GoalCategory>('TECH');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || Number(targetAmount) <= 0) return;
+    if (!title.trim() || !amount) return;
 
     await hapticsService.notifySuccess();
-    const newGoal: SavingsGoal = {
+    onAddGoal({
       id: `goal-${Date.now()}`,
       title: title.trim(),
-      targetAmount: Number(targetAmount),
+      targetAmount: Number(amount),
       category,
       createdAt: new Date().toISOString(),
-    };
+    });
 
-    onAddGoal(newGoal);
-    onClose();
     setTitle('');
-    setTargetAmount('10000');
+    setAmount('');
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="fixed inset-0 z-50 bg-zinc-950/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-4 select-none">
+      <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200">
+        <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-500/20 text-indigo-300 rounded-xl">
+            <div className="p-2 bg-zinc-800 text-amber-400 rounded-xl">
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Add Savings Goal</h3>
-              <p className="text-xs text-slate-400">Set a target reward to compound towards</p>
+              <h3 className="text-sm font-black text-white">Add Dream Wishlist Goal</h3>
+              <p className="text-[11px] text-zinc-400">Set item name & target price</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+            className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3.5">
-          {/* Goal Title */}
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Goal Name</label>
+            <label className="text-xs font-semibold text-zinc-300">Goal Name</label>
             <input
               type="text"
-              placeholder="e.g. Sony WH-CH720N or RTX GPU"
+              placeholder="e.g. PlayStation 5, AirPods Pro"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+              className="w-full bg-zinc-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs font-bold text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-400"
+              autoFocus
               required
             />
           </div>
 
-          {/* Target Amount */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Target Cost ({currency.symbol})</label>
+            <label className="text-xs font-semibold text-zinc-300">Target Cost ({currency.symbol})</label>
             <input
               type="number"
               min={100}
               step={100}
-              value={targetAmount}
-              onChange={(e) => setTargetAmount(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+              placeholder="5000"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full bg-zinc-950 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-400"
               required
             />
           </div>
 
-          {/* Category Picker */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Category</label>
-            <div className="grid grid-cols-2 gap-1.5">
-              {CATEGORIES.map((cat) => {
-                const isSelected = category === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setCategory(cat.id)}
-                    className={`p-2 rounded-xl border text-left flex items-center gap-1.5 transition-all text-xs ${
-                      isSelected
-                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold'
-                        : 'bg-slate-800/60 border-slate-700/40 text-slate-300'
-                    }`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span className="truncate">{cat.label}</span>
-                  </button>
-                );
-              })}
+            <label className="text-xs font-semibold text-zinc-300">Category</label>
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategory(cat.id)}
+                  className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                    category === cat.id
+                      ? 'bg-amber-400/10 border-amber-400 font-bold text-white'
+                      : 'bg-zinc-950 border-white/5 text-zinc-400 hover:bg-zinc-800'
+                  }`}
+                >
+                  <span className="text-base">{cat.icon}</span>
+                  <span className="text-xs">{cat.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-amber-400 to-indigo-500 text-slate-950 font-black text-xs rounded-2xl active:scale-98 transition-transform flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/20 cursor-pointer mt-2"
+            className="w-full py-3 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-amber-400/15 cursor-pointer mt-1"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Goal to Vault</span>
+            <Plus className="w-4 h-4 text-zinc-950" />
+            <span>Create Dream Goal</span>
           </button>
         </form>
       </div>

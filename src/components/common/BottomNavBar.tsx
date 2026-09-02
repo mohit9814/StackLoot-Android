@@ -26,7 +26,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/90 px-2 py-2 pb-safe no-select">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-2xl border-t border-white/5 px-2 py-2 pb-safe no-select">
       <div className="max-w-md mx-auto flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -37,15 +37,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               onClick={() => handleSelect(item.id)}
               className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-2xl transition-all cursor-pointer ${
                 isActive
-                  ? 'text-amber-400 font-black scale-105'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'text-amber-400 font-bold scale-105'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               <div
-                className={`p-1.5 rounded-2xl transition-all ${
+                className={`p-1.5 rounded-xl transition-all ${
                   isActive
-                    ? 'bg-amber-400/20 text-amber-300 ring-2 ring-amber-400/40 shadow-md shadow-amber-500/10'
-                    : 'bg-slate-900/60 text-slate-400'
+                    ? 'bg-amber-400/15 text-amber-400 border border-amber-400/30'
+                    : 'bg-zinc-900/60 text-zinc-400'
                 }`}
               >
                 <Icon className="w-5 h-5" />

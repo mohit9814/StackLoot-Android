@@ -24,7 +24,6 @@ export const PinGateModal: React.FC<PinGateModalProps> = ({
       const nextPin = pin + digit;
       setPin(nextPin);
       if (nextPin.length === 4) {
-        // Check PIN (default 9874)
         if (nextPin === '9874') {
           await hapticsService.notifySuccess();
           onSuccess();
@@ -47,21 +46,21 @@ export const PinGateModal: React.FC<PinGateModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-6 animate-in slide-in-from-bottom-6 duration-200">
+    <div className="fixed inset-0 z-50 bg-zinc-950/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-4 select-none">
+      <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-6 animate-in slide-in-from-bottom-6 duration-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl">
+            <div className="p-2.5 bg-zinc-800 text-amber-400 rounded-xl">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Parent Studio Lock</h3>
-              <p className="text-xs text-slate-400">Enter 4-digit PIN (Default: 9874)</p>
+              <h3 className="text-base font-black text-white">Parent Studio Lock</h3>
+              <p className="text-xs text-zinc-400">Enter 4-digit PIN (Default: 9874)</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,12 +73,12 @@ export const PinGateModal: React.FC<PinGateModalProps> = ({
             return (
               <div
                 key={idx}
-                className={`w-4 h-4 rounded-full transition-all duration-200 ${
+                className={`w-3.5 h-3.5 rounded-full transition-all duration-200 ${
                   error
                     ? 'bg-rose-500 animate-bounce'
                     : isFilled
-                    ? 'bg-amber-400 scale-110 shadow-lg shadow-amber-400/50'
-                    : 'bg-slate-800 border border-slate-700'
+                    ? 'bg-amber-400 scale-110 shadow-md shadow-amber-400/50'
+                    : 'bg-zinc-800 border border-white/10'
                 }`}
               />
             );
@@ -89,17 +88,17 @@ export const PinGateModal: React.FC<PinGateModalProps> = ({
         {error && (
           <p className="text-center text-xs text-rose-400 font-semibold flex items-center justify-center gap-1">
             <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Incorrect PIN. Please try again.</span>
+            <span>Incorrect PIN. Try 9874.</span>
           </p>
         )}
 
         {/* Number Pad */}
-        <div className="grid grid-cols-3 gap-3 pt-2">
+        <div className="grid grid-cols-3 gap-2.5 pt-1">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => (
             <button
               key={d}
               onClick={() => handleDigit(d)}
-              className="h-14 rounded-2xl bg-slate-800/80 active:bg-amber-500/20 text-xl font-bold text-white border border-slate-700/60 shadow-sm active:scale-95 transition-all flex items-center justify-center font-mono cursor-pointer"
+              className="h-13 rounded-2xl bg-zinc-800/90 active:bg-zinc-700 text-xl font-bold text-white border border-white/5 shadow-sm active:scale-95 transition-all flex items-center justify-center font-mono cursor-pointer"
             >
               {d}
             </button>
@@ -107,13 +106,13 @@ export const PinGateModal: React.FC<PinGateModalProps> = ({
           <div />
           <button
             onClick={() => handleDigit('0')}
-            className="h-14 rounded-2xl bg-slate-800/80 active:bg-amber-500/20 text-xl font-bold text-white border border-slate-700/60 shadow-sm active:scale-95 transition-all flex items-center justify-center font-mono cursor-pointer"
+            className="h-13 rounded-2xl bg-zinc-800/90 active:bg-zinc-700 text-xl font-bold text-white border border-white/5 shadow-sm active:scale-95 transition-all flex items-center justify-center font-mono cursor-pointer"
           >
             0
           </button>
           <button
             onClick={handleDelete}
-            className="h-14 rounded-2xl bg-slate-800/40 active:bg-rose-950/40 text-slate-400 hover:text-white border border-slate-700/40 shadow-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+            className="h-13 rounded-2xl bg-zinc-800/40 text-zinc-400 hover:text-white border border-white/5 shadow-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer"
           >
             <Delete className="w-5 h-5" />
           </button>
