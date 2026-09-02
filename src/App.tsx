@@ -486,6 +486,11 @@ export function App() {
         isOpen={isRoleModalOpen}
         currentRole={userRole}
         onSelectRole={handleSelectRole}
+        onResetOnboarding={async () => {
+          await nativeStorage.setOnboardingDone(false);
+          setIsOnboardingDone(false);
+          setIsWizardOpen(false);
+        }}
         onClose={() => setIsRoleModalOpen(false)}
       />
     </div>
