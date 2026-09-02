@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
 import { KeyRound, CheckCircle2, X } from 'lucide-react';
 import { hapticsService } from '../../services/hapticsService';
+import { confettiService } from '../../services/confettiService';
 
 interface TeenPairingModalProps {
   isOpen: boolean;
@@ -29,11 +29,7 @@ export const TeenPairingModal: React.FC<TeenPairingModalProps> = ({
     }
 
     await hapticsService.notifySuccess();
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
+    confettiService.fireUnlock();
 
     onPairSuccess(cleanCode);
     onClose();
@@ -54,7 +50,7 @@ export const TeenPairingModal: React.FC<TeenPairingModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -67,7 +63,7 @@ export const TeenPairingModal: React.FC<TeenPairingModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="e.g. LOOT-9842"
+              placeholder="e.g. LOOT-AKS98"
               value={code}
               onChange={(e) => {
                 setCode(e.target.value.toUpperCase());

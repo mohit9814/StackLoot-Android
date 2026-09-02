@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import confetti from 'canvas-confetti';
+import { confettiService } from './services/confettiService';
 import { MobileHeader } from './components/common/MobileHeader';
 import { BottomNavBar } from './components/common/BottomNavBar';
 import { MobileVaultView } from './components/teen/MobileVaultView';
@@ -55,11 +55,7 @@ export function App() {
     if (pairCode) {
       setUserRole('TEEN');
       nativeStorage.setUserRole('TEEN');
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.5 },
-      });
+      confettiService.fireUnlock();
       // Clean up URL query parameters without reloading
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
@@ -135,11 +131,7 @@ export function App() {
   };
 
   const handleActivatePlan = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
+    confettiService.fireCelebration();
 
     const nowIso = new Date().toISOString();
     const updated: Partial<UserProfile> = {
