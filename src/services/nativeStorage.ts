@@ -7,6 +7,7 @@ const STORAGE_KEY_PROFILES = 'stackloot_profiles_v1';
 const STORAGE_KEY_ACTIVE_PROFILE_ID = 'stackloot_active_profile_id_v1';
 const STORAGE_KEY_PARENT_PIN = 'stackloot_parent_pin_v1';
 const STORAGE_KEY_USER_ROLE = 'stackloot_user_role_v1';
+const STORAGE_KEY_ONBOARDING_DONE = 'stackloot_onboarding_done_v1';
 
 export function createDefaultProfile(id = 'profile-akshat-default', name = 'Akshat'): UserProfile {
   return {
@@ -118,6 +119,25 @@ export const nativeStorage = {
       localStorage.setItem(STORAGE_KEY_USER_ROLE, role);
     } catch (e) {
       console.error('Failed to set user role:', e);
+    }
+  },
+
+  async getOnboardingDone(): Promise<boolean> {
+    try {
+      const { value } = await Preferences.get({ key: STORAGE_KEY_ONBOARDING_DONE });
+      if (value === 'true') return true;
+      return localStorage.getItem(STORAGE_KEY_ONBOARDING_DONE) === 'true';
+    } catch {
+      return false;
+    }
+  },
+
+  async setOnboardingDone(done: boolean): Promise<void> {
+    try {
+      await Preferences.set({ key: STORAGE_KEY_ONBOARDING_DONE, value: done ? 'true' : 'false' });
+      localStorage.setItem(STORAGE_KEY_ONBOARDING_DONE, done ? 'true' : 'false');
+    } catch (e) {
+      console.error('Failed to set onboarding done:', e);
     }
   },
 

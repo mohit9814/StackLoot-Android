@@ -1,2 +1,2 @@
 export type UserRole = 'PARENT' | 'TEEN';
-export type MobileTab = 'VAULT' | 'SIMULATOR' | 'GOALS' | 'PARENT_STUDIO';
+export type MobileTab = 'VAULT' | 'SIMULATOR' | 'TASKS' | 'GOALS' | 'PARENT_STUDIO';
