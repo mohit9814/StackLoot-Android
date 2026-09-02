@@ -48,6 +48,7 @@ export function App() {
   const [userRole, setUserRole] = useState<AppUserRole>('TEEN');
   const [activeTab, setActiveTab] = useState<MobileTab>('VAULT');
   const [isPinGateOpen, setIsPinGateOpen] = useState<boolean>(false);
+  const [pinSuccessAction, setPinSuccessAction] = useState<(() => void) | null>(null);
   const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState<boolean>(false);
   const [isProfilePickerOpen, setIsProfilePickerOpen] = useState<boolean>(false);
   const [isAddGoalOpen, setIsAddGoalOpen] = useState<boolean>(false);
@@ -124,6 +125,15 @@ export function App() {
     return `LOOT-${activeProfile.teenName.slice(0, 3).toUpperCase()}98`;
   }, [activeProfile.teenName]);
 
+  const requireParentPin = (action: () => void) => {
+    if (userRole === 'PARENT' && isParentUnlocked) {
+      action();
+    } else {
+      setPinSuccessAction(() => action);
+      setIsPinGateOpen(true);
+    }
+  };
+
   const handleParentSetupComplete = async (
     setup: ParentOnboardingSetup,
     starterChores: Omit<ChoreTask, 'id' | 'assignedToProfileId' | 'status'>[]
@@ -192,7 +202,6 @@ export function App() {
     await nativeStorage.setOnboardingDone(true);
     await nativeStorage.setUserRole('PARENT');
 
-    // Initial activity log
     await activityService.addActivity({
       profileId: newProfiles[0].id,
       title: 'Family Vault Created',
@@ -208,18 +217,27 @@ export function App() {
   };
 
   const handleSelectRole = async (role: AppUserRole) => {
-    setUserRole(role);
-    await nativeStorage.setUserRole(role);
     if (role === 'PARENT') {
-      setIsPinGateOpen(true);
+      requireParentPin(() => {
+        setUserRole('PARENT');
+        nativeStorage.setUserRole('PARENT');
+        setIsParentUnlocked(true);
+        setActiveTab('PARENT_STUDIO');
+      });
     } else {
+      setUserRole('TEEN');
+      await nativeStorage.setUserRole('TEEN');
       setActiveTab('VAULT');
     }
   };
 
   const handleTabChange = (tab: MobileTab) => {
     if (tab === 'PARENT_STUDIO' && !isParentUnlocked) {
-      setIsPinGateOpen(true);
+      requireParentPin(() => {
+        setIsParentUnlocked(true);
+        setUserRole('PARENT');
+        setActiveTab('PARENT_STUDIO');
+      });
       return;
     }
     setActiveTab(tab);
@@ -228,12 +246,19 @@ export function App() {
   const handlePinSuccess = () => {
     setIsParentUnlocked(true);
     setIsPinGateOpen(false);
-    setUserRole('PARENT');
-    setActiveTab('PARENT_STUDIO');
+    if (pinSuccessAction) {
+      pinSuccessAction();
+      setPinSuccessAction(null);
+    } else {
+      setUserRole('PARENT');
+      setActiveTab('PARENT_STUDIO');
+    }
   };
 
   const handleLockParent = () => {
     setIsParentUnlocked(false);
+    setUserRole('TEEN');
+    nativeStorage.setUserRole('TEEN');
     setActiveTab('VAULT');
   };
 
@@ -316,21 +341,25 @@ export function App() {
   };
 
   const handleAddNewTask = async (newTaskData: Omit<ChoreTask, 'id' | 'status'>) => {
-    const created: ChoreTask = {
-      ...newTaskData,
-      id: `task-${Date.now()}`,
-      assignedToProfileId: activeProfile.id,
-      status: 'TODO',
-    };
-    const all = [...tasks, created];
-    await taskService.saveTasks(all);
-    setTasks(all);
+    requireParentPin(async () => {
+      const created: ChoreTask = {
+        ...newTaskData,
+        id: `task-${Date.now()}`,
+        assignedToProfileId: activeProfile.id,
+        status: 'TODO',
+      };
+      const all = [...tasks, created];
+      await taskService.saveTasks(all);
+      setTasks(all);
+    });
   };
 
   const handleUpdateTask = async (taskId: string, updates: Partial<ChoreTask>) => {
-    const updated = tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t));
-    await taskService.saveTasks(updated);
-    setTasks(updated);
+    requireParentPin(async () => {
+      const updated = tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t));
+      await taskService.saveTasks(updated);
+      setTasks(updated);
+    });
   };
 
   const handleLogStudioActivity = async (title: string, desc: string, amount: number) => {
@@ -344,7 +373,7 @@ export function App() {
     setActivities(acts);
   };
 
-  const handleActivatePlan = () => {
+  const executeActivatePlan = () => {
     confettiService.fireCelebration();
 
     const nowIso = new Date().toISOString();
@@ -362,17 +391,25 @@ export function App() {
         completionBonusPercentage: simParams.completionBonusPercentage,
         parentInterestMatchMultiplier: simParams.parentInterestMatchMultiplier,
         initialLumpSumDeposit: 0,
-        currentBalance: 0,
-        totalPrincipalContributed: 0,
-        totalInterestEarned: 0,
-        totalBonusesEarned: 0,
+        currentBalance: activeProfile.activePlan?.currentBalance || 0,
+        totalPrincipalContributed: activeProfile.activePlan?.totalPrincipalContributed || 0,
+        totalInterestEarned: activeProfile.activePlan?.totalInterestEarned || 0,
+        totalBonusesEarned: activeProfile.activePlan?.totalBonusesEarned || 0,
         status: 'ACTIVE',
-        transactions: [],
+        transactions: activeProfile.activePlan?.transactions || [],
       },
     };
 
     updateActiveProfileData(updated);
     setActiveTab('VAULT');
+  };
+
+  const handleActivatePlan = () => {
+    if (userRole === 'PARENT') {
+      executeActivatePlan();
+    } else {
+      requireParentPin(executeActivatePlan);
+    }
   };
 
   if (isLoading || isOnboardingDone === null) {
@@ -410,8 +447,8 @@ export function App() {
         profile={activeProfile}
         currency={activeCurrency}
         userRole={userRole}
-        onOpenProfilePicker={() => setIsProfilePickerOpen(true)}
-        onOpenCurrencyPicker={() => setIsCurrencyPickerOpen(true)}
+        onOpenProfilePicker={() => requireParentPin(() => setIsProfilePickerOpen(true))}
+        onOpenCurrencyPicker={() => requireParentPin(() => setIsCurrencyPickerOpen(true))}
         onOpenRolePicker={() => setIsRoleModalOpen(true)}
       />
 
@@ -433,6 +470,7 @@ export function App() {
             onChangeParams={setSimParams}
             simulation={simulationResult}
             currency={activeCurrency}
+            userRole={userRole}
             onActivatePlan={handleActivatePlan}
           />
         )}
@@ -481,11 +519,14 @@ export function App() {
         onChangeTab={handleTabChange}
       />
 
-      {/* PIN Security Gate Modal for Parent Studio */}
+      {/* PIN Security Gate Modal for Parent Protection */}
       <PinGateModal
         isOpen={isPinGateOpen}
         onSuccess={handlePinSuccess}
-        onClose={() => setIsPinGateOpen(false)}
+        onClose={() => {
+          setIsPinGateOpen(false);
+          setPinSuccessAction(null);
+        }}
       />
 
       {/* Multi-Currency Modal */}
@@ -506,7 +547,7 @@ export function App() {
         onClose={() => setIsProfilePickerOpen(false)}
       />
 
-      {/* Add Goal Modal */}
+      {/* Add Goal Modal (Accessible by Kid) */}
       <AddGoalModal
         isOpen={isAddGoalOpen}
         currency={activeCurrency}

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Sliders, Rocket } from 'lucide-react';
+import { Sliders, Rocket, Lock } from 'lucide-react';
 import type { SimulationParams, CurrencyConfig, SimulationResult } from '../../types/allowance';
+import type { AppUserRole } from '../../types/pairing';
 import { formatCurrency } from '../../config/currencies';
 import { hapticsService } from '../../services/hapticsService';
 
@@ -9,6 +10,7 @@ interface MobileGrowthLabProps {
   onChangeParams: (params: SimulationParams) => void;
   simulation: SimulationResult;
   currency: CurrencyConfig;
+  userRole: AppUserRole;
   onActivatePlan: () => void;
 }
 
@@ -17,6 +19,7 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
   onChangeParams,
   simulation,
   currency,
+  userRole,
   onActivatePlan,
 }) => {
   const baseRate = params.annualInterestRate || 30;
@@ -50,11 +53,13 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
         </div>
         <div>
           <h2 className="text-base font-black text-white">Growth Simulator</h2>
-          <p className="text-[11px] text-slate-400">Simulate how delayed gratification snowballs</p>
+          <p className="text-[11px] text-slate-400">
+            {userRole === 'TEEN' ? 'Simulate and explore how your money compounds' : 'Configure and simulate compound yield rules'}
+          </p>
         </div>
       </div>
 
-      {/* Challenge Presets (Using Configured Rates) */}
+      {/* Challenge Presets */}
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => handlePreset(3, baseRate, 10)}
@@ -172,10 +177,23 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
 
         <button
           onClick={onActivatePlan}
-          className="w-full py-3 bg-gradient-to-r from-amber-400 via-indigo-500 to-emerald-400 text-slate-950 font-black text-xs rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/25 cursor-pointer"
+          className={`w-full py-3 font-black text-xs rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-lg cursor-pointer ${
+            userRole === 'PARENT'
+              ? 'bg-gradient-to-r from-amber-400 via-indigo-500 to-emerald-400 text-slate-950 shadow-indigo-500/25'
+              : 'bg-slate-800 text-amber-300 border border-slate-700 shadow-slate-900/50'
+          }`}
         >
-          <Rocket className="w-4 h-4 text-slate-950" />
-          <span>Lock In These Rules for Vault</span>
+          {userRole === 'PARENT' ? (
+            <>
+              <Rocket className="w-4 h-4 text-slate-950" />
+              <span>Lock In These Rules for Vault</span>
+            </>
+          ) : (
+            <>
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span>Parent PIN Required to Lock In Rules</span>
+            </>
+          )}
         </button>
       </div>
     </div>

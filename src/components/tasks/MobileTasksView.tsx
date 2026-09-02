@@ -116,13 +116,15 @@ export const MobileTasksView: React.FC<MobileTasksViewProps> = ({
             <History className="w-4 h-4 text-indigo-400" />
           </button>
 
-          <button
-            onClick={() => setIsAdding(true)}
-            className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-indigo-500 text-slate-950 rounded-xl flex items-center gap-1 text-xs font-black active:scale-95 transition-all shadow-sm cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-slate-950" />
-            <span>New Task</span>
-          </button>
+          {userRole === 'PARENT' && (
+            <button
+              onClick={() => setIsAdding(true)}
+              className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-indigo-500 text-slate-950 rounded-xl flex items-center gap-1 text-xs font-black active:scale-95 transition-all shadow-sm cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-slate-950" />
+              <span>New Task</span>
+            </button>
+          )}
         </div>
       </div>
 

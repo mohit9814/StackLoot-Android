@@ -1,5 +1,5 @@
-import React from 'react';
-import { Wallet, TrendingUp, Sparkles, Award, Snowflake, Flame, QrCode } from 'lucide-react';
+import React, { useState } from 'react';
+import { Wallet, TrendingUp, Sparkles, Award, Snowflake, Flame, QrCode, History, ChevronDown, ChevronUp } from 'lucide-react';
 import type { UserProfile } from '../../types/profile';
 import type { CurrencyConfig, SimulationResult } from '../../types/allowance';
 import { formatCurrency, formatCurrencyExact } from '../../config/currencies';
@@ -20,6 +20,7 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
   onOpenGrowthLab,
   onOpenPairing,
 }) => {
+  const [showLedger, setShowLedger] = useState(false);
   const plan = profile.activePlan;
   const currentBalance = plan?.currentBalance || 0;
   const totalContributed = plan?.totalPrincipalContributed || 0;
@@ -39,6 +40,11 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
   const handleGrowthClick = async () => {
     await hapticsService.impactMedium();
     onOpenGrowthLab();
+  };
+
+  const handleToggleLedger = async () => {
+    await hapticsService.impactLight();
+    setShowLedger(!showLedger);
   };
 
   return (
@@ -117,7 +123,7 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
           </div>
         </div>
 
-        {/* 4-Pillar Stat Tiles (Actual Contributed & Earned) */}
+        {/* 4-Pillar Stat Tiles */}
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl space-y-0.5">
             <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
@@ -161,21 +167,54 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
         </div>
       </div>
 
-      {/* Interactive Earning Accelerator CTA */}
+      {/* Kid's Transparent Ledger Access */}
+      <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-3 shadow-sm space-y-2">
+        <button
+          onClick={handleToggleLedger}
+          className="w-full flex items-center justify-between text-xs font-bold text-slate-300 cursor-pointer p-1"
+        >
+          <div className="flex items-center gap-1.5">
+            <History className="w-4 h-4 text-indigo-400" />
+            <span>My Verified Ledger ({plan?.transactions?.length || 0} Entries)</span>
+          </div>
+          {showLedger ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+        </button>
+
+        {showLedger && (
+          <div className="space-y-1.5 pt-1 border-t border-slate-800 max-h-48 overflow-y-auto pr-1">
+            {plan?.transactions && plan.transactions.length > 0 ? (
+              plan.transactions.slice(-6).reverse().map((tx) => (
+                <div
+                  key={tx.id}
+                  className="flex justify-between items-center p-2 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs"
+                >
+                  <div>
+                    <span className="font-bold text-white block text-[11px]">{tx.notes || tx.type}</span>
+                    <span className="text-[9px] text-slate-400">{new Date(tx.date).toLocaleDateString()}</span>
+                  </div>
+                  <span className="font-mono font-black text-emerald-400 text-xs">
+                    +{formatCurrencyExact(tx.amount, currency)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-[11px] text-slate-400 py-1.5 text-center">No transactions recorded yet.</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Growth Accelerator Button */}
       <div className="bg-gradient-to-r from-amber-500/15 via-indigo-500/15 to-purple-500/15 border border-amber-500/30 rounded-3xl p-3.5 shadow-lg space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Snowflake className="w-4 h-4 text-amber-400" />
-            <h4 className="text-xs font-black text-white">Monthly Compounding Velocity</h4>
+            <h4 className="text-xs font-black text-white">Compound Multiplier</h4>
           </div>
           <span className="text-[10px] font-bold text-amber-400 font-mono">
-            {simulation.snowballFactor}x Faster
+            {simulation.snowballFactor}x Velocity
           </span>
         </div>
-
-        <p className="text-[11px] text-slate-300 leading-snug font-medium">
-          In Month 1, earns <strong>{formatCurrencyExact(simulation.breakdown[0]?.interestEarned || 25, currency)}/mo</strong>. By Month {targetMonths}, earns <strong>{formatCurrencyExact(simulation.breakdown[targetMonths - 1]?.interestEarned || 159.69, currency)}/mo</strong>!
-        </p>
 
         <button
           onClick={handleGrowthClick}
