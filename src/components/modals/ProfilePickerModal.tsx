@@ -90,7 +90,7 @@ export const ProfilePickerModal: React.FC<ProfilePickerModalProps> = ({
                       <div>
                         <span className="text-xs font-bold text-white block">{p.teenName}</span>
                         <span className="text-[10px] text-slate-400 font-mono">
-                          {p.activePlan ? 'Active Plan' : 'Pending Plan'} • Lvl {p.gamification.currentLevel}
+                          {p.activePlan ? 'Active Vault Plan' : 'Pending Vault Plan'}
                         </span>
                       </div>
                     </div>

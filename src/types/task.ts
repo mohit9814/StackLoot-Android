@@ -8,7 +8,6 @@ export interface ChoreTask {
   category: TaskCategory;
   frequency: TaskFrequency;
   rewardAmount: number;
-  xpReward: number;
   status: TaskStatus;
   assignedToProfileId: string;
   completedAt?: string;
@@ -22,23 +21,20 @@ export const DEFAULT_CHORE_TEMPLATES: Omit<ChoreTask, 'id' | 'assignedToProfileI
     category: 'READING',
     frequency: 'DAILY',
     rewardAmount: 50,
-    xpReward: 25,
     icon: '📚',
   },
   {
-    title: 'Complete Math & Science Homework Early',
+    title: 'Complete Homework Early',
     category: 'STUDY',
     frequency: 'DAILY',
     rewardAmount: 50,
-    xpReward: 30,
     icon: '📐',
   },
   {
-    title: 'Keep Study Desk & Room Organized (5 Days)',
+    title: 'Keep Study Desk & Room Organized',
     category: 'CHORES',
     frequency: 'WEEKLY',
-    rewardAmount: 150,
-    xpReward: 50,
+    rewardAmount: 100,
     icon: '🧹',
   },
   {
@@ -46,7 +42,6 @@ export const DEFAULT_CHORE_TEMPLATES: Omit<ChoreTask, 'id' | 'assignedToProfileI
     category: 'FITNESS',
     frequency: 'DAILY',
     rewardAmount: 50,
-    xpReward: 25,
     icon: '⚽',
   },
 ];

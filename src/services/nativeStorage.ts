@@ -21,12 +21,6 @@ export function createDefaultProfile(id = 'profile-akshat-default', name = 'Aksh
     simulationParams: { ...DEFAULT_SIMULATION_PARAMS },
     activePlan: null,
     goals: [...DEFAULT_INITIAL_GOALS],
-    gamification: {
-      currentLevel: 1,
-      totalXp: 50,
-      unlockedBadgeIds: ['FIRST_DEPOSIT'],
-      streakMonths: 0,
-    },
   };
 }
 
@@ -38,7 +32,6 @@ export const nativeStorage = {
         const parsed = JSON.parse(value);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-      // fallback to localStorage
       const local = localStorage.getItem(STORAGE_KEY_PROFILES);
       if (local) {
         const parsed = JSON.parse(local);
@@ -161,12 +154,6 @@ export const nativeStorage = {
       },
       activePlan: null,
       goals: [...DEFAULT_INITIAL_GOALS],
-      gamification: {
-        currentLevel: 1,
-        totalXp: 50,
-        unlockedBadgeIds: ['FIRST_DEPOSIT'],
-        streakMonths: 0,
-      },
     };
 
     const updated = [...profiles, newProfile];

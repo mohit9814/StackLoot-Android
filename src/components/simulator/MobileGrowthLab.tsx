@@ -19,6 +19,8 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
   currency,
   onActivatePlan,
 }) => {
+  const baseRate = params.annualInterestRate || 30;
+
   const handlePreset = async (months: number, rate: number, bonus: number) => {
     await hapticsService.impactMedium();
     onChangeParams({
@@ -52,10 +54,10 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
         </div>
       </div>
 
-      {/* Challenge Presets */}
+      {/* Challenge Presets (Using Configured Rates) */}
       <div className="grid grid-cols-3 gap-2">
         <button
-          onClick={() => handlePreset(3, 30, 10)}
+          onClick={() => handlePreset(3, baseRate, 10)}
           className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer active:scale-95 ${
             params.termMonths === 3
               ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm'
@@ -63,11 +65,11 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
           }`}
         >
           <span className="text-xs font-black block">3-Mo Sprint</span>
-          <span className="text-[10px] font-bold text-amber-400">30% + 10%</span>
+          <span className="text-[10px] font-bold text-amber-400">{baseRate}% + 10%</span>
         </button>
 
         <button
-          onClick={() => handlePreset(6, 30, 20)}
+          onClick={() => handlePreset(6, baseRate, 20)}
           className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer active:scale-95 ${
             params.termMonths === 6
               ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm'
@@ -75,11 +77,11 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
           }`}
         >
           <span className="text-xs font-black block">6-Mo Marathon</span>
-          <span className="text-[10px] font-bold text-amber-400">30% + 20%</span>
+          <span className="text-[10px] font-bold text-amber-400">{baseRate}% + 20%</span>
         </button>
 
         <button
-          onClick={() => handlePreset(12, 35, 25)}
+          onClick={() => handlePreset(12, baseRate + 5, 25)}
           className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer active:scale-95 ${
             params.termMonths === 12
               ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm'
@@ -87,7 +89,7 @@ export const MobileGrowthLab: React.FC<MobileGrowthLabProps> = ({
           }`}
         >
           <span className="text-xs font-black block">12-Mo Master</span>
-          <span className="text-[10px] font-bold text-amber-400">35% + 25%</span>
+          <span className="text-[10px] font-bold text-amber-400">{baseRate + 5}% + 25%</span>
         </button>
       </div>
 

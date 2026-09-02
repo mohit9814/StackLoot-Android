@@ -22,6 +22,10 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
 }) => {
   const plan = profile.activePlan;
   const currentBalance = plan?.currentBalance || 0;
+  const totalContributed = plan?.totalPrincipalContributed || 0;
+  const totalInterest = plan?.totalInterestEarned || 0;
+  const totalMatch = plan?.totalBonusesEarned || 0;
+
   const targetMonths = plan?.targetTermMonths || profile.simulationParams.termMonths || 6;
   const completedMonths = plan
     ? Math.min(targetMonths, Math.floor(plan.transactions.filter((t) => t.type === 'DEPOSIT').length))
@@ -52,7 +56,7 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
                 {profile.teenName}'s Vault
               </span>
               <span className="text-[10px] text-slate-400 font-medium">
-                {plan ? '🔒 Compounding Active' : '⚡ Ready to Launch'}
+                {plan && completedMonths > 0 ? `Month ${completedMonths} of ${targetMonths}` : '⚡ Cycle 1 Ready to Start'}
               </span>
             </div>
           </div>
@@ -95,12 +99,12 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
         </div>
       </div>
 
-      {/* Projected Maturity Payout Banner */}
+      {/* Real-time Ledger Pillars Card */}
       <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-3.5 shadow-lg space-y-2.5">
         <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
           <div>
             <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Projected Maturity Payout
+              Projected Maturity Payout ({targetMonths} Mo)
             </h3>
             <div className="text-xl font-black text-emerald-400 font-mono mt-0.5">
               {formatCurrency(simulation.finalTotalBalance, currency)}
@@ -113,42 +117,42 @@ export const MobileVaultView: React.FC<MobileVaultViewProps> = ({
           </div>
         </div>
 
-        {/* 4-Pillar Stat Tiles */}
+        {/* 4-Pillar Stat Tiles (Actual Contributed & Earned) */}
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl space-y-0.5">
             <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
               <Wallet className="w-3.5 h-3.5 text-blue-400" />
-              <span>Saved Principal</span>
+              <span>Contributed Principal</span>
             </div>
             <div className="text-sm font-black text-white font-mono">
-              {formatCurrency(simulation.totalPrincipalSaved, currency)}
+              {formatCurrency(totalContributed, currency)}
             </div>
           </div>
 
           <div className="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl space-y-0.5">
             <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{interestRate}% Yield</span>
+              <span>Yield Earned</span>
             </div>
             <div className="text-sm font-black text-emerald-400 font-mono">
-              +{formatCurrency(simulation.totalInterestEarned, currency)}
+              +{formatCurrency(totalInterest, currency)}
             </div>
           </div>
 
           <div className="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl space-y-0.5">
             <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>{matchPercent}% Match</span>
+              <span>{parentTitle} {matchPercent}% Match</span>
             </div>
             <div className="text-sm font-black text-purple-300 font-mono">
-              +{formatCurrency(simulation.totalParentInterestMatch, currency)}
+              +{formatCurrency(totalMatch, currency)}
             </div>
           </div>
 
           <div className="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl space-y-0.5">
             <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold">
               <Award className="w-3.5 h-3.5 text-amber-400" />
-              <span>Milestone Bonus</span>
+              <span>Maturity Bonus Target</span>
             </div>
             <div className="text-sm font-black text-amber-400 font-mono">
               +{formatCurrency(simulation.completionBonus, currency)}

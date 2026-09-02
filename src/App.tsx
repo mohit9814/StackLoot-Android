@@ -20,6 +20,7 @@ import { calculateCompoundSchedule } from './services/compoundEngine';
 import { CURRENCIES } from './config/currencies';
 import { nativeStorage } from './services/nativeStorage';
 import { taskService } from './services/taskService';
+import { activityService } from './services/activityService';
 import { confettiService } from './services/confettiService';
 import type { MobileTab } from './types/userRole';
 import type { SimulationParams, CurrencyCode } from './types/allowance';
@@ -27,6 +28,7 @@ import type { UserProfile } from './types/profile';
 import type { SavingsGoal } from './types/goal';
 import type { AppUserRole } from './types/pairing';
 import type { ChoreTask } from './types/task';
+import type { ActivityItem } from './types/activity';
 import type { ParentOnboardingSetup } from './types/onboarding';
 
 export function App() {
@@ -54,6 +56,7 @@ export function App() {
   const [isTeenPairingOpen, setIsTeenPairingOpen] = useState<boolean>(false);
   const [isParentUnlocked, setIsParentUnlocked] = useState<boolean>(false);
   const [tasks, setTasks] = useState<ChoreTask[]>([]);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [simParams, setSimParams] = useState<SimulationParams>(() => activeProfile.simulationParams);
 
   // Sync simulation parameters whenever active profile changes
@@ -63,17 +66,19 @@ export function App() {
     }
   }, [activeProfile?.id, activeProfile?.simulationParams]);
 
-  // Load tasks for active profile
-  const refreshTasks = useCallback(async (profileId: string) => {
+  // Load tasks & activities for active profile
+  const refreshTasksAndActivities = useCallback(async (profileId: string) => {
     const profileTasks = await taskService.getTasksForProfile(profileId);
+    const profileActs = await activityService.getActivities(profileId);
     setTasks(profileTasks);
+    setActivities(profileActs);
   }, []);
 
   useEffect(() => {
     if (activeProfile?.id) {
-      refreshTasks(activeProfile.id);
+      refreshTasksAndActivities(activeProfile.id);
     }
-  }, [activeProfile?.id, refreshTasks]);
+  }, [activeProfile?.id, refreshTasksAndActivities]);
 
   // Load saved user role & onboarding status on startup
   useEffect(() => {
@@ -123,7 +128,6 @@ export function App() {
     setup: ParentOnboardingSetup,
     starterChores: Omit<ChoreTask, 'id' | 'assignedToProfileId' | 'status'>[]
   ) => {
-    // 1. Build customized profiles for each child
     const newProfiles: UserProfile[] = setup.children.map((child, idx) => ({
       id: `profile-${Date.now()}-${idx}`,
       teenName: child.name,
@@ -168,15 +172,9 @@ export function App() {
           createdAt: new Date().toISOString(),
         },
       ],
-      gamification: {
-        currentLevel: 1,
-        totalXp: 50,
-        unlockedBadgeIds: ['FIRST_DEPOSIT'],
-        streakMonths: 0,
-      },
     }));
 
-    // 2. Seed selected chores
+    // Seed selected chores
     const initialTasks: ChoreTask[] = [];
     newProfiles.forEach((profile) => {
       starterChores.forEach((chore, cIdx) => {
@@ -190,10 +188,17 @@ export function App() {
     });
     await taskService.saveTasks(initialTasks);
 
-    // 3. Save profiles & update active state
     await setAllProfiles(newProfiles);
     await nativeStorage.setOnboardingDone(true);
     await nativeStorage.setUserRole('PARENT');
+
+    // Initial activity log
+    await activityService.addActivity({
+      profileId: newProfiles[0].id,
+      title: 'Family Vault Created',
+      description: `${setup.parentName} configured Bank of ${setup.parentName} with ${setup.annualInterestRate}% yield.`,
+      type: 'PLAN_ACTIVATED',
+    });
 
     setUserRole('PARENT');
     setIsParentUnlocked(true);
@@ -239,11 +244,30 @@ export function App() {
   const handleAddGoal = (newGoal: SavingsGoal) => {
     const updatedGoals = [...activeProfile.goals, newGoal];
     updateActiveProfileData({ goals: updatedGoals });
+    activityService.addActivity({
+      profileId: activeProfile.id,
+      title: 'New Wishlist Goal',
+      description: `${activeProfile.teenName} added "${newGoal.title}" (${activeCurrency.symbol}${newGoal.targetAmount})`,
+      type: 'GOAL_CREATED',
+      amount: newGoal.targetAmount,
+    });
   };
 
   const handleMarkTaskCompleted = async (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
     const updated = await taskService.markTaskCompleted(taskId);
     setTasks(updated.filter((t) => t.assignedToProfileId === activeProfile.id));
+
+    if (task) {
+      const acts = await activityService.addActivity({
+        profileId: activeProfile.id,
+        title: 'Task Review Requested',
+        description: `${activeProfile.teenName} completed "${task.title}"`,
+        type: 'TASK_SUBMITTED',
+        amount: task.rewardAmount,
+      });
+      setActivities(acts);
+    }
   };
 
   const handleApproveTask = async (taskId: string) => {
@@ -276,13 +300,19 @@ export function App() {
             ],
           }
         : null,
-      gamification: {
-        ...activeProfile.gamification,
-        totalXp: activeProfile.gamification.totalXp + task.xpReward,
-      },
+      updatedAt: nowIso,
     };
 
     updateActiveProfileData(updatedProfile);
+
+    const acts = await activityService.addActivity({
+      profileId: activeProfile.id,
+      title: 'Bounty Approved & Credited',
+      description: `${activeProfile.parentName} approved "${task.title}" (+${activeCurrency.symbol}${task.rewardAmount})`,
+      type: 'TASK_APPROVED',
+      amount: task.rewardAmount,
+    });
+    setActivities(acts);
   };
 
   const handleAddNewTask = async (newTaskData: Omit<ChoreTask, 'id' | 'status'>) => {
@@ -295,6 +325,23 @@ export function App() {
     const all = [...tasks, created];
     await taskService.saveTasks(all);
     setTasks(all);
+  };
+
+  const handleUpdateTask = async (taskId: string, updates: Partial<ChoreTask>) => {
+    const updated = tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t));
+    await taskService.saveTasks(updated);
+    setTasks(updated);
+  };
+
+  const handleLogStudioActivity = async (title: string, desc: string, amount: number) => {
+    const acts = await activityService.addActivity({
+      profileId: activeProfile.id,
+      title,
+      description: desc,
+      type: 'MONTH_PROGRESSED',
+      amount,
+    });
+    setActivities(acts);
   };
 
   const handleActivatePlan = () => {
@@ -393,12 +440,15 @@ export function App() {
         {activeTab === 'TASKS' && (
           <MobileTasksView
             tasks={tasks}
+            activities={activities}
             currency={activeCurrency}
             userRole={userRole}
             teenName={activeProfile.teenName}
+            parentName={activeProfile.parentName}
             onMarkTaskCompleted={handleMarkTaskCompleted}
             onApproveTask={handleApproveTask}
             onAddNewTask={handleAddNewTask}
+            onUpdateTask={handleUpdateTask}
           />
         )}
 
@@ -420,6 +470,7 @@ export function App() {
             onUpdatePlan={(updated) => updateActiveProfileData(updated)}
             onLockSession={handleLockParent}
             onOpenPairing={() => setIsParentPairingOpen(true)}
+            onLogActivity={handleLogStudioActivity}
           />
         )}
       </main>

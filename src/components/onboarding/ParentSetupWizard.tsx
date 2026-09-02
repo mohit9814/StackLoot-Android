@@ -27,11 +27,11 @@ interface ParentSetupWizardProps {
 
 const AVATARS = ['🚀', '💎', '🦁', '⚡', '🎮', '🎸', '👑', '🔥'];
 
-const DEFAULT_STARTER_CHORES = [
-  { title: 'Read 20 Mins of a Non-Fiction Book', category: 'READING' as const, frequency: 'DAILY' as const, rewardAmount: 50, xpReward: 25, icon: '📚' },
-  { title: 'Complete Homework Early', category: 'STUDY' as const, frequency: 'DAILY' as const, rewardAmount: 50, xpReward: 30, icon: '📐' },
-  { title: 'Keep Study Desk & Room Organized', category: 'CHORES' as const, frequency: 'WEEKLY' as const, rewardAmount: 100, xpReward: 50, icon: '🧹' },
-  { title: 'Daily 30-Min Workout / Sports Practice', category: 'FITNESS' as const, frequency: 'DAILY' as const, rewardAmount: 50, xpReward: 25, icon: '⚽' },
+const INITIAL_STARTER_CHORES: Omit<ChoreTask, 'id' | 'assignedToProfileId' | 'status'>[] = [
+  { title: 'Read 20 Mins of a Non-Fiction Book', category: 'READING', frequency: 'DAILY', rewardAmount: 50, icon: '📚' },
+  { title: 'Complete Homework Early', category: 'STUDY', frequency: 'DAILY', rewardAmount: 50, icon: '📐' },
+  { title: 'Keep Study Desk & Room Organized', category: 'CHORES', frequency: 'WEEKLY', rewardAmount: 100, icon: '🧹' },
+  { title: 'Daily 30-Min Workout / Sports Practice', category: 'FITNESS', frequency: 'DAILY', rewardAmount: 50, icon: '⚽' },
 ];
 
 export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete, onCancel }) => {
@@ -52,8 +52,8 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
   const [annualInterestRate, setAnnualInterestRate] = useState(30);
   const [parentMatchMultiplier, setParentMatchMultiplier] = useState(1);
 
-  // Step 4: Chores Selection
-  const [selectedChores, setSelectedChores] = useState(DEFAULT_STARTER_CHORES);
+  // Step 4: Chores Customization
+  const [choresList, setChoresList] = useState(INITIAL_STARTER_CHORES);
 
   // Step 5: Copy status
   const [copied, setCopied] = useState(false);
@@ -85,13 +85,16 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
     setChildren(children.map((c) => (c.id === id ? { ...c, ...updates } : c)));
   };
 
-  const handleToggleChore = (choreTitle: string) => {
-    if (selectedChores.some((c) => c.title === choreTitle)) {
-      setSelectedChores(selectedChores.filter((c) => c.title !== choreTitle));
-    } else {
-      const choreToAdd = DEFAULT_STARTER_CHORES.find((c) => c.title === choreTitle);
-      if (choreToAdd) setSelectedChores([...selectedChores, choreToAdd]);
-    }
+  const handleChoreRewardChange = (index: number, newAmount: number) => {
+    const updated = [...choresList];
+    updated[index] = { ...updated[index], rewardAmount: newAmount };
+    setChoresList(updated);
+  };
+
+  const handleChoreTitleChange = (index: number, newTitle: string) => {
+    const updated = [...choresList];
+    updated[index] = { ...updated[index], title: newTitle };
+    setChoresList(updated);
   };
 
   const handleCopyCode = async () => {
@@ -137,7 +140,7 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
           completionBonusPercentage: 20,
           termMonths: 6,
         },
-        selectedChores
+        choresList
       );
     }
   };
@@ -158,7 +161,7 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
             {step === 1 && 'Parent Persona & Currency'}
             {step === 2 && 'Setup Your Children'}
             {step === 3 && 'Allowance & Bank of Parent Yield'}
-            {step === 4 && 'Chores & Responsibility Bounties'}
+            {step === 4 && 'Chores & Bounty Rewards'}
             {step === 5 && 'Wishlists & Child Mobile Pairing'}
           </h2>
         </div>
@@ -305,10 +308,10 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
             <div className="p-3 bg-gradient-to-r from-amber-500/15 via-indigo-500/15 to-purple-500/15 border border-amber-500/30 rounded-2xl space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-black text-amber-400">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>The Superpower of 30% Yield:</span>
+                <span>The Superpower of {annualInterestRate}% Yield:</span>
               </div>
               <p className="text-[11px] text-slate-300 leading-snug">
-                When kids see their saved allowance grow at <strong>30% p.a. + 100% parent match</strong>, delayed gratification becomes an irresistible winning game.
+                When kids see their saved allowance grow at <strong>{annualInterestRate}% p.a. + {parentMatchMultiplier * 100}% parent match</strong>, delayed gratification becomes an irresistible winning game.
               </p>
             </div>
 
@@ -332,7 +335,7 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
 
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-1.5">
               <div className="flex justify-between items-center text-xs font-bold">
-                <span className="text-slate-300">Bank of Parent Yield</span>
+                <span className="text-slate-300">Bank of {parentName} Yield</span>
                 <span className="text-xs font-mono font-black text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-600/40">
                   {annualInterestRate}% p.a. ({(annualInterestRate / 12).toFixed(1)}%/mo)
                 </span>
@@ -375,7 +378,7 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
           </div>
         )}
 
-        {/* STEP 4: Chores & Responsibility Setup */}
+        {/* STEP 4: Chores & Responsibility Setup (Fully Customizable) */}
         {step === 4 && (
           <div className="space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
@@ -383,41 +386,39 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs font-black text-white">Starter Chores & Responsibilities</h3>
-                <p className="text-[11px] text-slate-400">Select bounties to incentivize daily habits</p>
+                <h3 className="text-xs font-black text-white">Starter Chores & Bounty Amounts</h3>
+                <p className="text-[11px] text-slate-400">Edit chore names & cash rewards as you wish</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              {DEFAULT_STARTER_CHORES.map((chore) => {
-                const isSelected = selectedChores.some((c) => c.title === chore.title);
-                return (
-                  <div
-                    key={chore.title}
-                    onClick={() => handleToggleChore(chore.title)}
-                    className={`p-3 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-amber-500/15 border-amber-400/60 text-white'
-                        : 'bg-slate-900 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xl">{chore.icon}</span>
-                      <div>
-                        <h4 className="text-xs font-bold leading-tight">{chore.title}</h4>
-                        <span className="text-[10px] text-amber-300 font-bold uppercase">{chore.frequency}</span>
-                      </div>
-                    </div>
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              {choresList.map((chore, idx) => (
+                <div key={idx} className="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{chore.icon}</span>
+                    <input
+                      type="text"
+                      value={chore.title}
+                      onChange={(e) => handleChoreTitleChange(idx, e.target.value)}
+                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white font-bold"
+                    />
+                  </div>
 
-                    <div className="text-right">
-                      <span className="text-xs font-black font-mono text-emerald-400 block">
-                        +{formatCurrency(chore.rewardAmount, currencyConfig)}
-                      </span>
-                      <span className="text-[9px] font-bold text-indigo-300">+{chore.xpReward} XP</span>
+                  <div className="flex justify-between items-center pl-7 text-[11px]">
+                    <span className="text-slate-400 uppercase font-semibold">{chore.frequency}</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">Reward:</span>
+                      <input
+                        type="number"
+                        value={chore.rewardAmount}
+                        onChange={(e) => handleChoreRewardChange(idx, Number(e.target.value))}
+                        className="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-xs text-emerald-400 font-mono font-bold text-right"
+                      />
+                      <span className="text-emerald-400 font-bold">{currencyConfig.symbol}</span>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -433,31 +434,31 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
               <div className="space-y-0.5">
                 <h4 className="text-xs font-bold text-white">Child Goal & Wishlist System</h4>
                 <p className="text-[11px] text-slate-300 leading-tight">
-                  {primaryChildName} can add dream items (e.g. PlayStation, Bicycle) and see the exact month they can afford it!
+                  {primaryChildName} can add dream items (PlayStation, Bicycle) and see the predictive compounding timeline to afford it!
                 </p>
               </div>
             </div>
 
             {/* Mobile Pairing Card */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center space-y-3">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center space-y-2.5">
               <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-400">
                 <QrCode className="w-4 h-4" />
                 <span>Pair {primaryChildName}'s Phone:</span>
               </div>
 
-              <div className="bg-white p-3 rounded-2xl shadow-inner mx-auto inline-block">
-                <QRCodeSVG value={pairingUrl} size={130} level="M" />
+              <div className="bg-white p-2.5 rounded-2xl shadow-inner mx-auto inline-block">
+                <QRCodeSVG value={pairingUrl} size={120} level="M" />
               </div>
 
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-2 font-mono font-black text-amber-400 text-lg tracking-widest">
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-1.5 font-mono font-black text-amber-400 text-base tracking-widest">
                 {familyInviteCode}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-2 pt-0.5">
                 <button
                   type="button"
                   onClick={handleCopyCode}
-                  className="py-2.5 px-2 bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer border border-slate-700"
+                  className="py-2 px-2 bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer border border-slate-700"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy Code'}</span>
@@ -466,7 +467,7 @@ export const ParentSetupWizard: React.FC<ParentSetupWizardProps> = ({ onComplete
                 <button
                   type="button"
                   onClick={handleShareWhatsApp}
-                  className="py-2.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 cursor-pointer shadow-md shadow-emerald-600/20"
+                  className="py-2 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 cursor-pointer shadow-md shadow-emerald-600/20"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   <span>WhatsApp</span>

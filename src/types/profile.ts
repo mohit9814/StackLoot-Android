@@ -1,6 +1,5 @@
 import type { SimulationParams, ActivePlanLedger, CurrencyCode } from './allowance';
 import type { SavingsGoal } from './goal';
-import type { UserGamificationState } from './gamification';
 
 export interface UserProfile {
   id: string;
@@ -13,7 +12,6 @@ export interface UserProfile {
   simulationParams: SimulationParams;
   activePlan: ActivePlanLedger | null;
   goals: SavingsGoal[];
-  gamification: UserGamificationState;
 }
 
 export interface CreateProfileParams {
