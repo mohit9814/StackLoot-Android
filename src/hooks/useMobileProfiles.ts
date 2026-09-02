@@ -65,6 +65,15 @@ export function useMobileProfiles() {
     return created;
   }, []);
 
+  const setAllProfiles = useCallback(async (newProfiles: UserProfile[]) => {
+    setProfiles(newProfiles);
+    if (newProfiles.length > 0) {
+      setActiveProfileId(newProfiles[0].id);
+      await nativeStorage.setActiveProfileId(newProfiles[0].id);
+    }
+    await nativeStorage.saveProfiles(newProfiles);
+  }, []);
+
   return {
     profiles,
     activeProfile,
@@ -73,5 +82,6 @@ export function useMobileProfiles() {
     switchProfile,
     updateActiveProfileData,
     createNewProfile,
+    setAllProfiles,
   };
 }

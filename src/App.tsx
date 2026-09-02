@@ -37,6 +37,7 @@ export function App() {
     switchProfile,
     updateActiveProfileData,
     createNewProfile,
+    setAllProfiles,
     isLoading,
   } = useMobileProfiles();
 
@@ -54,6 +55,13 @@ export function App() {
   const [isParentUnlocked, setIsParentUnlocked] = useState<boolean>(false);
   const [tasks, setTasks] = useState<ChoreTask[]>([]);
   const [simParams, setSimParams] = useState<SimulationParams>(() => activeProfile.simulationParams);
+
+  // Sync simulation parameters whenever active profile changes
+  useEffect(() => {
+    if (activeProfile?.simulationParams) {
+      setSimParams(activeProfile.simulationParams);
+    }
+  }, [activeProfile?.id, activeProfile?.simulationParams]);
 
   // Load tasks for active profile
   const refreshTasks = useCallback(async (profileId: string) => {
@@ -111,7 +119,10 @@ export function App() {
     return `LOOT-${activeProfile.teenName.slice(0, 3).toUpperCase()}98`;
   }, [activeProfile.teenName]);
 
-  const handleParentSetupComplete = async (setup: ParentOnboardingSetup) => {
+  const handleParentSetupComplete = async (
+    setup: ParentOnboardingSetup,
+    starterChores: Omit<ChoreTask, 'id' | 'assignedToProfileId' | 'status'>[]
+  ) => {
     // 1. Build customized profiles for each child
     const newProfiles: UserProfile[] = setup.children.map((child, idx) => ({
       id: `profile-${Date.now()}-${idx}`,
@@ -165,8 +176,22 @@ export function App() {
       },
     }));
 
-    await nativeStorage.saveProfiles(newProfiles);
-    await nativeStorage.setActiveProfileId(newProfiles[0].id);
+    // 2. Seed selected chores
+    const initialTasks: ChoreTask[] = [];
+    newProfiles.forEach((profile) => {
+      starterChores.forEach((chore, cIdx) => {
+        initialTasks.push({
+          ...chore,
+          id: `task-${profile.id}-${cIdx}-${Date.now()}`,
+          assignedToProfileId: profile.id,
+          status: 'TODO',
+        });
+      });
+    });
+    await taskService.saveTasks(initialTasks);
+
+    // 3. Save profiles & update active state
+    await setAllProfiles(newProfiles);
     await nativeStorage.setOnboardingDone(true);
     await nativeStorage.setUserRole('PARENT');
 
@@ -174,8 +199,7 @@ export function App() {
     setIsParentUnlocked(true);
     setIsWizardOpen(false);
     setIsOnboardingDone(true);
-    setActiveTab('PARENT_STUDIO');
-    window.location.reload();
+    setActiveTab('VAULT');
   };
 
   const handleSelectRole = async (role: AppUserRole) => {
@@ -345,7 +369,7 @@ export function App() {
       />
 
       {/* Main Screen Content */}
-      <main className="flex-1 max-w-md w-full mx-auto px-4 py-4">
+      <main className="flex-1 max-w-md w-full mx-auto px-3.5 py-3">
         {activeTab === 'VAULT' && (
           <MobileVaultView
             profile={activeProfile}
