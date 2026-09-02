@@ -20,6 +20,9 @@ export const ParentPairingModal: React.FC<ParentPairingModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Real Network URL so any generic phone camera (Google Lens / iPhone Camera) immediately opens the app!
+  const pairingUrl = `http://192.168.1.10:5174/?role=TEEN&pair=${inviteCode}&teen=${encodeURIComponent(teenName)}`;
+
   const handleCopy = async () => {
     await hapticsService.impactLight();
     try {
@@ -33,7 +36,7 @@ export const ParentPairingModal: React.FC<ParentPairingModalProps> = ({
 
   const handleShareWhatsApp = async () => {
     await hapticsService.impactMedium();
-    const text = `Hey ${teenName}! Join your StackLoot Compounding Vault using Family Code: *${inviteCode}* to track your allowance and earn 30% yield!`;
+    const text = `Hey ${teenName}! Join your StackLoot Compounding Vault by opening this link: ${pairingUrl} or using Family Code: *${inviteCode}* to track your allowance and earn 30% yield!`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -49,34 +52,34 @@ export const ParentPairingModal: React.FC<ParentPairingModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-black text-white">Pair {teenName}'s Phone</h3>
-              <p className="text-xs text-slate-400">100% Free instant family link</p>
+              <p className="text-xs text-slate-400">Scan with your Phone Camera</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* QR Code Container */}
-        <div className="flex flex-col items-center justify-center bg-white p-4 rounded-2xl shadow-inner mx-auto max-w-[200px]">
+        {/* QR Code Container (Universal Web Link) */}
+        <div className="flex flex-col items-center justify-center bg-white p-4 rounded-2xl shadow-inner mx-auto max-w-[210px]">
           <QRCodeSVG
-            value={`stackloot://pair?code=${inviteCode}&teen=${encodeURIComponent(teenName)}`}
-            size={168}
-            level="H"
+            value={pairingUrl}
+            size={172}
+            level="M"
             includeMargin={false}
           />
-          <span className="text-[10px] font-bold text-slate-500 mt-2">
-            Scan from Teen's StackLoot App
+          <span className="text-[11px] font-bold text-slate-700 mt-2 text-center">
+            Point Phone Camera to Open
           </span>
         </div>
 
         {/* Family Code Pill */}
         <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3 text-center space-y-1">
           <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-            Or Enter 6-Digit Family Code:
+            Or Enter 6-Digit Code in App:
           </span>
           <div className="text-2xl font-black font-mono tracking-widest text-amber-400">
             {inviteCode}
@@ -98,14 +101,14 @@ export const ParentPairingModal: React.FC<ParentPairingModalProps> = ({
             className="py-3 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-emerald-600/20 cursor-pointer"
           >
             <Share2 className="w-4 h-4" />
-            <span>Send via WhatsApp</span>
+            <span>Send WhatsApp</span>
           </button>
         </div>
 
         {/* Security Note */}
         <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
           <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Private end-to-end Family Vault pairing</span>
+          <span>Works across Wi-Fi & Mobile Network</span>
         </div>
       </div>
     </div>

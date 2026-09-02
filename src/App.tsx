@@ -46,8 +46,32 @@ export function App() {
   const [isParentUnlocked, setIsParentUnlocked] = useState<boolean>(false);
   const [simParams, setSimParams] = useState<SimulationParams>(() => activeProfile.simulationParams);
 
-  // Load saved user role on startup
+  // Load saved user role or auto-pair from URL QR Code scan on startup
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pairCode = params.get('pair');
+    const roleParam = params.get('role');
+
+    if (pairCode) {
+      setUserRole('TEEN');
+      nativeStorage.setUserRole('TEEN');
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 },
+      });
+      // Clean up URL query parameters without reloading
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    if (roleParam === 'PARENT' || roleParam === 'TEEN') {
+      setUserRole(roleParam);
+      nativeStorage.setUserRole(roleParam);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
     nativeStorage.getUserRole().then((saved: AppUserRole) => {
       if (saved) setUserRole(saved);
     });
