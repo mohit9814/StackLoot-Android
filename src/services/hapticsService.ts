@@ -40,4 +40,12 @@ export const hapticsService = {
       // ignore
     }
   },
+
+  async notifyError(): Promise<void> {
+    try {
+      await Haptics.notification({ type: NotificationType.Error });
+    } catch {
+      // ignore
+    }
+  },
 };

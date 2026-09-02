@@ -1,10 +1,12 @@
 import { Preferences } from '@capacitor/preferences';
 import type { UserProfile, CreateProfileParams } from '../types/profile';
+import type { AppUserRole } from '../types/pairing';
 import { DEFAULT_SIMULATION_PARAMS, DEFAULT_INITIAL_GOALS } from '../config/appConfig';
 
 const STORAGE_KEY_PROFILES = 'stackloot_profiles_v1';
 const STORAGE_KEY_ACTIVE_PROFILE_ID = 'stackloot_active_profile_id_v1';
 const STORAGE_KEY_PARENT_PIN = 'stackloot_parent_pin_v1';
+const STORAGE_KEY_USER_ROLE = 'stackloot_user_role_v1';
 
 export function createDefaultProfile(id = 'profile-akshat-default', name = 'Akshat'): UserProfile {
   return {
@@ -95,6 +97,27 @@ export const nativeStorage = {
       await Preferences.set({ key: STORAGE_KEY_PARENT_PIN, value: pin });
     } catch (e) {
       console.error('Failed to set parent PIN:', e);
+    }
+  },
+
+  async getUserRole(): Promise<AppUserRole> {
+    try {
+      const { value } = await Preferences.get({ key: STORAGE_KEY_USER_ROLE });
+      if (value === 'PARENT' || value === 'TEEN') return value;
+      const local = localStorage.getItem(STORAGE_KEY_USER_ROLE);
+      if (local === 'PARENT' || local === 'TEEN') return local;
+      return 'TEEN';
+    } catch {
+      return 'TEEN';
+    }
+  },
+
+  async setUserRole(role: AppUserRole): Promise<void> {
+    try {
+      await Preferences.set({ key: STORAGE_KEY_USER_ROLE, value: role });
+      localStorage.setItem(STORAGE_KEY_USER_ROLE, role);
+    } catch (e) {
+      console.error('Failed to set user role:', e);
     }
   },
 

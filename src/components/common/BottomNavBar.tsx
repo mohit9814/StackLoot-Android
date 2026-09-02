@@ -34,22 +34,22 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             <button
               key={item.id}
               onClick={() => handleSelect(item.id)}
-              className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all cursor-pointer ${
+              className={`flex flex-col items-center gap-1 py-1 px-3.5 rounded-2xl transition-all cursor-pointer ${
                 isActive
-                  ? 'text-amber-400 font-bold scale-105'
+                  ? 'text-amber-400 font-black scale-105'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <div
-                className={`p-1.5 rounded-xl transition-all ${
+                className={`p-2 rounded-2xl transition-all ${
                   isActive
-                    ? 'bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30'
-                    : 'bg-transparent text-slate-400'
+                    ? 'bg-amber-400/20 text-amber-300 ring-2 ring-amber-400/40 shadow-md shadow-amber-500/10'
+                    : 'bg-slate-900/60 text-slate-400'
                 }`}
               >
                 <Icon className="w-5 h-5" />
               </div>
-              <span className="text-[11px] tracking-tight">{item.label}</span>
+              <span className="text-xs tracking-tight">{item.label}</span>
             </button>
           );
         })}
